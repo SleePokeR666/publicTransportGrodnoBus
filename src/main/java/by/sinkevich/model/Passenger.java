@@ -1,11 +1,10 @@
-package by.sinkevich;
+package by.sinkevich.model;
 
 public class Passenger {
 
 	private String name;
+
 	private BusStopName destination;
-	private boolean isAlive;
-	private BusStop currentBusStop;
 
 	public Passenger(String name, BusStopName destination) {
 		this.name = name;

@@ -1,4 +1,4 @@
-package by.sinkevich;
+package by.sinkevich.model;
 
 public enum BusStopName {
 
