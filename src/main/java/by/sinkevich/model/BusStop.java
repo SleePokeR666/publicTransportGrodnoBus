@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class BusStop {
 
@@ -15,14 +17,25 @@ public class BusStop {
 
 	private BlockingQueue<BusService> busServices;
 
+	private Lock lock;
+
 	public BusStop(BusStopName name) {
 		this.name = name;
 		passengers = new LinkedList<>();
 		busServices = new ArrayBlockingQueue<>(3, true);
+		lock = new ReentrantLock(true);
 	}
 
 	public boolean addPassenger(Passenger passenger) {
 		return passengers.add(passenger);
+	}
+
+	public long getPassengersLoadTime() {
+		return 500L;
+	}
+
+	public long getRouteTime() {
+		return 1000L;
 	}
 
 	public BusStopName getName() {
@@ -37,11 +50,8 @@ public class BusStop {
 		return busServices;
 	}
 
-	public long getPassengersLoadTime() {
-		return 1000L;
+	public Lock getLock() {
+		return lock;
 	}
 
-	public long getRouteTime() {
-		return 1500L;
-	}
 }

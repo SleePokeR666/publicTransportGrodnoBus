@@ -9,15 +9,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayDeque;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class BusService extends Bus implements Runnable {
 
 	private static final Logger LOG = LogManager.getLogger();
-
-	private static final Lock lock = new ReentrantLock();
 
 	private BusStop currentStop;
 
@@ -35,11 +33,9 @@ public class BusService extends Bus implements Runnable {
 			sleep(currentStop.getRouteTime());
 			takePlaceOnTheBusStop();
 
-			lock.lock();
 			unloadPassengers();
 			sleep(currentStop.getPassengersLoadTime());
 			loadPassengers();
-			lock.unlock();
 
 			freePlaceOnTheBusStop();
 			sleep(currentStop.getRouteTime());
@@ -76,8 +72,8 @@ public class BusService extends Bus implements Runnable {
 			LOG.error(e.getMessage(), e);
 			Thread.currentThread().interrupt();
 		}
-		String message = String.format("Автобус номер %d приехал на остановку %s",
-				number, currentStop.getName());
+		String message = String.format("Автобус номер %d приехал на остановку %s. Автобусов на остановке: %d",
+				number, currentStop.getName(), currentStop.getBusServices().size());
 		LOG.info(message);
 	}
 
@@ -89,21 +85,27 @@ public class BusService extends Bus implements Runnable {
 	}
 
 	private void loadPassengers() {
-		for (Passenger passenger : currentStop.getPassengers()) {
+		Lock lock = currentStop.getLock();
+		lock.lock();
+		Iterator<Passenger> iterator = currentStop.getPassengers().iterator();
+		while (iterator.hasNext()) {
+			Passenger passenger = iterator.next();
 			if (route.contains(passenger.getDestination())) {
 				passengers.add(passenger);
-				currentStop.getPassengers().remove(passenger);
-				System.out.println(passenger.getName() + " сел в автобус номер " + number);
+				LOG.info(String.format("%s сел в автобус номер %d", passenger.getName(), number));
+				iterator.remove();
 			}
 		}
+		lock.unlock();
 	}
 
 	private void unloadPassengers() {
-		for (Passenger passenger : passengers) {
+		Iterator<Passenger> iterator = passengers.iterator();
+		while (iterator.hasNext()) {
+			Passenger passenger = iterator.next();
 			if (passenger.getDestination() == currentStop.getName()) {
-				currentStop.getPassengers().add(passenger);
-				passengers.remove(passenger);
-				System.out.println(passenger.getName() + " вышел");
+				iterator.remove();
+				LOG.info(String.format("%s вышел", passenger.getName()));
 			}
 		}
 	}

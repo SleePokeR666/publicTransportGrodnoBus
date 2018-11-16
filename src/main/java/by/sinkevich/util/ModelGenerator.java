@@ -1,10 +1,10 @@
 package by.sinkevich.util;
 
 import by.sinkevich.CityMap;
-import by.sinkevich.service.BusService;
 import by.sinkevich.model.BusStop;
 import by.sinkevich.model.BusStopName;
 import by.sinkevich.model.Passenger;
+import by.sinkevich.service.BusService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,11 +16,13 @@ public class ModelGenerator {
 
 	private static final Logger LOG = LogManager.getLogger();
 
+	private static int busCounter = 0;
+
 	public ModelGenerator() {
 		super();
 	}
 
-	private static ArrayDeque<BusStopName> createRoute(BusStopName startingPoint) {
+	private ArrayDeque<BusStopName> createRoute(BusStopName startingPoint) {
 		ArrayDeque<BusStopName> route = new ArrayDeque<>();
 		switch (startingPoint) {
 			case VISHNEVETS:
@@ -75,8 +77,8 @@ public class ModelGenerator {
 		return route;
 	}
 
-	public Passenger createPassenger(BusStopName startingPoint, BusStopName destination) {
-		Passenger passenger = new Passenger("Denis", destination);
+	public Passenger createPassenger(BusStopName startingPoint, BusStopName destination, String name) {
+		Passenger passenger = new Passenger(name, destination);
 		String message = String.format("Пассажир %s пришёл на остановку %s чтобы доехать на %s",
 				passenger, startingPoint, destination);
 		LOG.info(message);
@@ -85,15 +87,13 @@ public class ModelGenerator {
 		return passenger;
 	}
 
-	public BusService createBus(BusStopName startingPoint, BusStopName destination) {
-		for (int i = 1; i < 5; i++) {
-			ArrayDeque<BusStopName> route = createRoute(startingPoint);
-			BusService busService = new BusService(i, route);
-			String message = String.format("Автобус номер %d выехал на маршрут %s -- %s",
-					busService.getNumber(), startingPoint, destination);
-			LOG.info(message);
-			new Thread(busService).start();
-		}
-		return null;
+	public BusService createBusService(BusStopName startingPoint, BusStopName destination) {
+		ArrayDeque<BusStopName> route = createRoute(startingPoint);
+		BusService busService = new BusService(++busCounter, route);
+		String message = String.format("Автобус номер %d выехал на маршрут %s -- %s",
+				busService.getNumber(), startingPoint, destination);
+		LOG.info(message);
+		new Thread(busService).start();
+		return busService;
 	}
 }
