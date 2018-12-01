@@ -22,7 +22,7 @@ public class BusStop {
 	public BusStop(BusStopName name) {
 		this.name = name;
 		passengers = new LinkedList<>();
-		busServices = new ArrayBlockingQueue<>(3, true);
+		busServices = new ArrayBlockingQueue<>(name.getMaxBusCapacity(), true);
 		lock = new ReentrantLock(true);
 	}
 
@@ -31,11 +31,11 @@ public class BusStop {
 	}
 
 	public long getPassengersLoadTime() {
-		return 500L;
+		return name.getPassengersLoadTime();
 	}
 
 	public long getRouteTime() {
-		return 1000L;
+		return name.getRouteTime();
 	}
 
 	public BusStopName getName() {
