@@ -1,8 +1,6 @@
 package by.sinkevich.model;
 
-import java.util.ArrayDeque;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Bus {
 
@@ -24,5 +22,19 @@ public class Bus {
 
 	public ArrayDeque<BusStopName> getRoute() {
 		return route;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Bus)) return false;
+		Bus bus = (Bus) o;
+		return number == bus.number &&
+				Arrays.equals(route.toArray(), bus.route.toArray());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(number, route);
 	}
 }
