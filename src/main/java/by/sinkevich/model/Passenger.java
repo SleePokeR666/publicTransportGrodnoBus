@@ -6,6 +6,10 @@ public class Passenger {
 
 	private BusStopName destination;
 
+	public Passenger() {
+		super();
+	}
+
 	public Passenger(String name, BusStopName destination) {
 		this.name = name;
 		this.destination = destination;

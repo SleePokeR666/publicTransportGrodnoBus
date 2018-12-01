@@ -1,6 +1,7 @@
 package by.sinkevich.util;
 
 import by.sinkevich.CityMap;
+import by.sinkevich.model.Bus;
 import by.sinkevich.model.BusStop;
 import by.sinkevich.model.BusStopName;
 import by.sinkevich.model.Passenger;
@@ -15,8 +16,6 @@ import static by.sinkevich.model.BusStopName.*;
 public class ModelGenerator {
 
 	private static final Logger LOG = LogManager.getLogger();
-
-	private static int busCounter = 0;
 
 	public ModelGenerator() {
 		super();
@@ -77,23 +76,27 @@ public class ModelGenerator {
 		return route;
 	}
 
-	public Passenger createPassenger(BusStopName startingPoint, BusStopName destination, String name) {
-		Passenger passenger = new Passenger(name, destination);
+	public Passenger putPassengerOnBusStop(Passenger passenger, BusStopName startPoint) {
 		String message = String.format("Пассажир %s пришёл на остановку %s чтобы доехать на %s",
-				passenger, startingPoint, destination);
+				passenger.getName(), startPoint, passenger.getDestination());
 		LOG.info(message);
-		BusStop busStop = CityMap.BUS_STOPS.get(startingPoint);
+		BusStop busStop = CityMap.BUS_STOPS.get(startPoint);
 		busStop.addPassenger(passenger);
 		return passenger;
 	}
 
-	public BusService createBusService(BusStopName startingPoint, BusStopName destination) {
-		ArrayDeque<BusStopName> route = createRoute(startingPoint);
-		BusService busService = new BusService(++busCounter, route);
+	public Bus createBusWithRouteFromStartPoint(int number, BusStopName startPoint) {
+		ArrayDeque<BusStopName> route = createRoute(startPoint);
+		return new Bus(number, route);
+	}
+
+	public BusService createBusService(Bus bus) {
+		BusService busService = new BusService(bus);
 		String message = String.format("Автобус номер %d выехал на маршрут %s -- %s",
-				busService.getNumber(), startingPoint, destination);
+				busService.getNumber(),
+				busService.getRoute().getFirst(),
+				busService.getRoute().getLast());
 		LOG.info(message);
-		new Thread(busService).start();
 		return busService;
 	}
 }

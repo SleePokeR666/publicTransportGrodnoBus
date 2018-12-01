@@ -21,4 +21,8 @@ public class Bus {
 	public int getNumber() {
 		return number;
 	}
+
+	public ArrayDeque<BusStopName> getRoute() {
+		return route;
+	}
 }

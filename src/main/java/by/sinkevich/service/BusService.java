@@ -3,12 +3,10 @@ package by.sinkevich.service;
 import by.sinkevich.CityMap;
 import by.sinkevich.model.Bus;
 import by.sinkevich.model.BusStop;
-import by.sinkevich.model.BusStopName;
 import by.sinkevich.model.Passenger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.concurrent.locks.Lock;
@@ -21,8 +19,8 @@ public class BusService extends Bus implements Runnable {
 
 	private boolean isRunning;
 
-	public BusService(int number, ArrayDeque<BusStopName> route) {
-		super(number, route);
+	public BusService(Bus bus) {
+		super(bus.getNumber(), bus.getRoute());
 		isRunning = true;
 	}
 
@@ -104,8 +102,9 @@ public class BusService extends Bus implements Runnable {
 		while (iterator.hasNext()) {
 			Passenger passenger = iterator.next();
 			if (passenger.getDestination() == currentStop.getName()) {
-				iterator.remove();
+				currentStop.getPassengers().add(passenger);
 				LOG.info(String.format("%s вышел", passenger.getName()));
+				iterator.remove();
 			}
 		}
 	}
